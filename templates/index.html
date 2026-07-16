@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cultural OS Simulator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="app-header">
+        <h1> Cultural OS: Global Arena</h1>
+        <p>Interactive Multi-Turn Cross-Cultural Simulator</p>
+    </header>
+
+    <!-- Global Introduction Header Card -->
+    <div class="card intro-header-card" id="intro-header">
+        <div class="intro-badge">⚡ Core Engine Framework</div>
+        
+        <!-- A. THIS IS FOR THE FRONT PAGE -->
+        <div id="landing-text">
+            <h2>🌐 Universal Culture Shock & Negotiation Simulator</h2>
+            <p class="intro-description">
+                Welcome to the arena. This system is designed to stress-test your communication, cross-cultural competence, and negotiation boundaries across high-friction professional scenarios. 
+            </p>
+            <div class="matrix-explainer">
+                <strong>The Evaluation Model:</strong> Every session runs for a strict sequence of <strong>3 turns</strong>. Upon completion, the core engine analyzes the transcript and outputs a comprehensive <strong>Cultural OS Diagnostic Matrix</strong> scoring your performance across three critical metrics:
+                <span class="metric-tag">Contextual Harmony</span>, 
+                <span class="metric-tag">Risk Alignment</span>, and 
+                <span class="metric-tag">Practical Actionable Takeaways</span>.
+            </div>
+        </div>
+
+        <!-- B. THIS IS FOR THE SECOND PAGE (Hidden initially) -->
+        <div id="active-scenario-text" style="display: none;">
+            <!-- We will inject the Persona and Situation here dynamically using JS -->
+        </div>
+    </div>
+
+    <main class="main-container">           
+
+        <section class="left-panel">
+            <!-- Configuration Box -->
+            <div class="card setup-card" id="setup-section">
+                <h3>🎭 Configure Simulator Counterpart</h3>
+                <p class="subtitle">Enter a custom persona, background scenario, and communication style to initialize the arena.</p>
+                
+                <textarea id="persona-input" rows="4" placeholder="Example: You are Kenji Tanaka, a conservative Japanese Merchandising Manager..."></textarea>
+                <button id="start-btn" onclick="startSimulation()">Initialize Simulator Arena</button>
+            </div>
+
+            <!-- Interactive Chat Window (Hidden until started) -->
+            <div class="chat-card element-hidden" id="chat-section">
+                <div class="chat-header">
+                    <span id="arena-status">🔴 Live Arena Session</span>
+                    <span id="turn-badge" class="badge">Turn: 0 / 3</span>
+                </div>
+                
+                <div id="chat-log" class="chat-log">
+                    <!-- Dynamic chat messages go here -->
+                </div>
+
+                <div class="chat-input-area" id="input-area">
+                    <input type="text" id="user-msg-input" placeholder="Type your strategic response here..." onkeypress="handleKeyPress(event)">
+                    <button id="send-btn" onclick="sendMessage()">Send Pitch</button>
+                </div> 
+                <div class="diagnostic-panel" style="margin-top: 15px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                    <h3>📋 Cultural OS Diagnostic Matrix</h3>
+                    <p class="subtitle">Sharp, multi-turn evaluation mapping contextual harmony, risk alignment, and actionable takeaways.</p>
+                    <div id="diagnostic-content"></div>
+                    
+                    <!-- Reset Button! -->
+                    <div class="action-zone" style="margin-top: 20px; text-align: right;">
+                        <button type="button" id="reset-btn" class="btn-secondary">🔄 Reset & Try New Persona</button>
+                    </div>
+                </div>        
+                
+            </div>
+        </section>
+        
+
+        <!-- RIGHT COLUMN: Live Cultural OS Diagnostics -->
+        <section class="right-panel">
+            <div class="card diagnostic-card">
+                <h3>📋 Responsible Communication Diagnostics</h3>
+                <p class="subtitle">Instructive breakdown evaluating professional ethics, empathy, and constructive problem-solving metrics.</p>
+                <hr>
+                <div id="diagnostic-output" class="diagnostic-output empty-state">
+                    Waiting for the completion of the 3-turn interactive exchange loop to output matrix diagnostics...
+                </div>
+                
+                
+            </div>
+        </section>
+    </main>
+
+    <!-- Frontend logic to handle server interactions without refreshing -->
+    <script>
+        let currentTurn = 0;
+
+        async function startSimulation() {
+            const personaText = document.getElementById('persona-input').value.trim();
+            if (!personaText) {
+                alert('Please outline a target persona descriptor to activate the matrix.');
+                return;
+            }
+
+            const startBtn = document.getElementById('start-btn');
+            startBtn.disabled = true;
+            startBtn.innerText = 'Engaging Engine...';
+
+            try {
+                const response = await fetch('/start_simulation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ persona: personaText })
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    alert(data.error);
+                    startBtn.disabled = false;
+                    startBtn.innerText = 'Initialize Simulator Arena';
+                    return;
+                }
+
+                // 1. Shrink the header card cleanly
+                const header = document.getElementById('intro-header');
+                if (header) {
+                    header.classList.add('compact-header');
+                }
+
+                // 2. Hide the front page welcome text and show the active scenario text instead!
+                const landingText = document.getElementById('landing-text');
+                const activeText = document.getElementById('active-scenario-text');
+
+                // Grab your single input value (defaults to 'Custom Scenario' if empty)
+                const personaVal = document.getElementById('persona-input')?.value.trim() || 'Custom Scenario';
+
+                if (landingText && activeText) {
+                    // Hide the welcome/explainer text completely
+                    landingText.style.display = 'none';
+                    
+                    // Make our active box visible
+                    activeText.style.display = 'block';
+                    
+                    // Inject your beautiful, clean active scenario directly into the box!
+                    activeText.innerHTML = `
+                        <h2 style="margin: 0 0 8px 0; font-size: 1.25rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                            🎭 Active Scenario
+                        </h2>
+                        <p style="margin: 0; font-size: 0.95rem; color: #475569; line-height: 1.5; font-style: italic;">
+                            "${personaVal}"
+                        </p>
+                    `;
+                }
+
+                // 2. Direct, foolproof panel transition using raw IDs
+                document.getElementById('setup-section').classList.add('element-hidden');
+                document.getElementById('chat-section').classList.remove('element-hidden');
+
+                // 3. Render initial chat block and set badge to 0
+                renderChat(data.history);
+                updateTurnBadge(0);
+                
+            } catch (err) {
+                alert('Network connection lost: ' + err);
+                startBtn.disabled = false;
+                startBtn.innerText = 'Initialize Simulator Arena';
+            }
+        }
+
+        async function sendMessage() {
+            const msgInput = document.getElementById('user-msg-input');
+            const userText = msgInput.value.trim();
+            if (!userText) return;
+
+            // Clean, isolated frontend turn tracker:
+            const turnBadge = document.getElementById('turn-badge');
+            let currentDisplayedTurn = 0;
+            if (turnBadge) {
+                currentDisplayedTurn = parseInt(turnBadge.innerText.match(/\d+/)) || 0;
+            }                       
+            
+            // Disable inputs immediately to prevent double submissions/hammering
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
+            msgInput.disabled = true;
+
+            // Add local message to UI right away so the user feels the response is instant
+            msgInput.value = '';
+            appendLocalMessage('user', userText);
+            
+            try {
+                const response = await fetch('/send_message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userText })
+                });
+
+                // Handle physical HTTP error states (like rate limits or temporary service drops)
+                if (!response.ok) {
+                    if (response.status === 429) {
+                        alert("⚠️ Gemini is currently busy (Rate Limit 429). Please wait a few seconds and try sending again!");
+                    } else {
+                        alert("⚠️ Server communication error. Please try again in a moment.");
+                    }
+                    sendBtn.disabled = false;
+                    msgInput.disabled = false;
+                    msgInput.value = userText; // Restore their text so they don't have to retype it!
+                    return;
+                }
+                
+                const data = await response.json();
+
+                // Handle any error returned gracefully by your Python server
+                if (data.error) {
+                    alert("⚠️ " + data.error);
+                    sendBtn.disabled = false;
+                    msgInput.disabled = false;
+                    msgInput.value = userText;
+                    return;
+                }
+
+                // 1. Render the new chat log
+                renderChat(data.history);   
+                
+                // 2. Safely increment the turn badge on screen now
+                if (turnBadge && currentDisplayedTurn < 3) {
+                    turnBadge.innerText = `Turn: ${currentDisplayedTurn + 1} / 3`;
+                }
+
+                // 3. Handle End of Simulation vs Next Turn
+                if (data.diagnostic_report) {
+                    // Simulation finished!
+                    document.getElementById('arena-status').innerText = '🏁 Simulation Concluded';
+                    document.getElementById('arena-status').style.color = '#a3a3a3';
+                    document.getElementById('input-area').innerHTML = '<p class="complete-notice">🔒 Interactive loop complete. View your Diagnostic Report on the right.</p>';
+                    
+                    const leftContent = document.getElementById('diagnostic-content');
+                    if (leftContent) {
+                        leftContent.innerHTML = ''; // Keep left panel clean           
+                    }
+
+                    // DISPLAY THE REPORT
+                    const rightPanelOutput = document.getElementById('diagnostic-output');
+                    if (rightPanelOutput) {
+                        rightPanelOutput.classList.remove('empty-state');                                                
+                        rightPanelOutput.innerHTML = `<pre class="report-text">${data.diagnostic_report}</pre>`;
+                    }                   
+                    
+                } else {
+                    // Keep looping safely: re-enable inputs for the next turn
+                    sendBtn.disabled = false;
+                    msgInput.disabled = false;
+                    msgInput.focus();
+                }
+            } catch (err) {
+                // Handle unexpected network/connection dropouts
+                console.error("Server communication failed:", err);
+                alert("⚠️ Connection failed. Please check your internet connection and try again.");
+                sendBtn.disabled = false;
+                msgInput.disabled = false;
+                msgInput.value = userText; // Keep their text safe
+            }
+        }
+
+        function renderChat(history) {
+            const log = document.getElementById('chat-log');
+            log.innerHTML = '';
+            history.forEach(msg => {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble ${msg.role}-bubble`;
+                bubble.innerText = msg.text;
+                log.appendChild(bubble);
+            });
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function appendLocalMessage(role, text) {
+            const log = document.getElementById('chat-log');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role}-bubble`;
+            bubble.innerText = text;
+            log.appendChild(bubble);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateTurnBadge(count) {
+            document.getElementById('turn-badge').innerText = `Turn: ${count} / 3`;
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        document.getElementById('reset-btn').addEventListener('click', function() {
+            if (confirm("Ready to clear this session and set up a new persona?")) {
+                fetch('/reset_simulation', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove the compact view class so the landing page looks big and welcoming again
+                        const header = document.getElementById('intro-header');
+                        if (header) header.classList.remove('compact-header');
+                        // Instantly reloads the entire application back to the clean front page!
+                        window.location.reload(); 
+                    }
+                })
+                .catch(err => console.error('Error resetting arena:', err));
+            }
+        });
+    </script>
+</body>
+</html>

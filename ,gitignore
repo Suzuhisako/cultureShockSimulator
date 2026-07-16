@@ -1,0 +1,13 @@
+# Python bytecode (VSCode creates these automatically)
+__pycache__/
+*.pyc
+
+# Local Environment secrets
+.env
+*.env
+
+# VS Code settings and workspace files
+.vscode/
+
+# macOS system files (if you or anyone else uses a Mac)
+.DS_Store
