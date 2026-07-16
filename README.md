@@ -39,7 +39,6 @@ pip install -r requirements.txt
 Configure Environment Variables:
 Create a file named .env in the root directory and add your Gemini API key:
 
-コード スニペット
 GEMINI_API_KEY=your_actual_api_key_here
 
 Run the Application:
