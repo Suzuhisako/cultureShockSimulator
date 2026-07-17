@@ -56,15 +56,14 @@ Automatic Lock & Evaluation: Upon sending your 3rd message, the frontend safely 
 
 Iterate: Click the Reset button on the left panel to wipe the slate clean and try a new persona on teh front page.
 
-### 🤖 Model Selection (Gemini 2.5 vs 3.5)
+### 🤖 Model Selection (Gemini 3.5 vs 2.5)
 
-By default, this application is configured to use **`gemini-2.5-flash`**. 
-* **Why?** It provides a highly stable, fast conversational flow with generous free-tier API quotas, making it perfect for rapid testing and out-of-the-box runnability.
+By default, this application is configured to use **`gemini-3.5-flash`**. 
+If you prefer a highly stable, fast conversational flow with generous free-tier API quotas, change it to **`gemini-2.5-flash`**. It is perfect for rapid testing and out-of-the-box runnability.
 
-If you have a pay-as-you-go Google billing account or want to experience deeper, highly sophisticated cultural diagnostics, you can easily upgrade to **`gemini-3.5-flash`**:
 1. Open `app.py`.
-2. Locate the model configuration in the `/start_simulation` and `/send_message` routes.
-3. Change `model="gemini-2.5-flash"` to `model="gemini-3.5-flash"`.
+2. Locate the model configuration in the `/start_simulation` and `/send_message` routes. 
+3. Change `model="gemini-3.5-flash"` to `model="gemini-2.5-flash"`.
 
 
 🛡️ License
