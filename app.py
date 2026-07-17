@@ -59,7 +59,7 @@ def start_simulation():
         "that allows the user to practice professional de-escalation, empathy, and safe problem-solving."
     )
     chat = client.chats.create(
-        model="gemini-2.5-flash",
+        model="gemini-3.5-flash",
         config=types.GenerateContentConfig(
             system_instruction=system_msg,
             temperature=0.4
@@ -97,7 +97,7 @@ def send_message():
     
     # Reconstruct the running chat session context natively
     chat = client.chats.create(
-        model="gemini-2.5-flash",
+        model="gemini-3.5-flash",
         config=types.GenerateContentConfig(
             system_instruction=f"You are the following persona: {persona}. Stay strictly in character. Keep responses brief.",
             temperature=0.4
@@ -127,7 +127,7 @@ def send_message():
                 
                 # Use your clean, isolated model generation call
                 report_response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-3.5-flash',
                     contents=evaluation_payload,
                     config={'temperature': 0.2}
                 )
