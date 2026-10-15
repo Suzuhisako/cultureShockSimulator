@@ -65,7 +65,9 @@ If you prefer a highly stable, fast conversational flow with generous free-tier 
 2. Locate the model configuration in the `/start_simulation` and `/send_message` routes. 
 3. Change `model="gemini-3.5-flash"` to `model="gemini-2.5-flash"`.
 
+```
 
-🛡️ License
+---
+## 🛡️ License
 This project is licensed under the MIT License. See the LICENSE file for details.
 """
